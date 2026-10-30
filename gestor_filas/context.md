@@ -35,6 +35,22 @@ Gerenciar atendimentos médicos com ficha, horário estimado, agenda e lembretes
 - Registrar envio bem-sucedido somente após confirmação da API do Telegram e evitar reenvios em verificações posteriores.
 - Executar verificação periódica e recebimento de respostas em um único processo dedicado, usando long polling, sem exigir webhook público.
 - Configurar o token do bot pela variável `TELEGRAM_BOT_TOKEN` no arquivo `.env` desta pasta. Esse arquivo fica de fora do Git. Se faltar token ou vínculo do paciente, mostrar a pendência; não simular envio como se fosse real.
+- Basear a integração nos exemplos em [telegram_examplos](../telegram_examplos), descritos abaixo.
+
+## Exemplos de Telegram
+
+Usar estes arquivos como base do desenvolvimento, no estilo `requests` e API HTTP do Bot:
+
+- [send_message.py](../telegram_examplos/send_message.py): `sendMessage` com `requests.post`.
+- [get_chat_id.py](../telegram_examplos/get_chat_id.py): `getUpdates` para ler o chat de quem falou com o bot.
+- [escuta.py](../telegram_examplos/escuta.py): long polling com `offset` e laço contínuo. Esse é o modelo do `worker`. Nesta aplicação a escuta roda a cada 10 segundos.
+
+Ao adaptar os exemplos:
+
+- Os exemplos leem `TOKEN_BOT`. Nesta aplicação o nome é `TELEGRAM_BOT_TOKEN`, carregado do `.env` desta pasta.
+- Aproveitar o ciclo de `getUpdates` de `escuta.py`. Deixar de lado a extração de URLs e a gravação de textos na pasta `fila/`.
+- Os exemplos enviam apenas texto. O pedido de confirmação acrescenta os botões Confirmar e Cancelar, e o polling também trata a resposta desses botões.
+- Considerar o envio bem-sucedido quando a resposta JSON da API indicar sucesso, no mesmo retorno usado em `send_message.py`. Só então preencher a data de aviso ou de lembrete.
 
 ## Tabelas e relacionamentos preestabelecidos
 
@@ -76,7 +92,7 @@ Regras:
 - Iniciar leva Agendado ou Confirmado para Em atendimento e exige que o profissional não tenha outro atendimento em andamento. Concluir leva Em atendimento para Concluído.
 - Concluído e Cancelado não mudam de estado e não recebem Telegram.
 - Ativo, para o conflito de horário, é tudo o que não está Concluído nem Cancelado. O conflito é o mesmo profissional com o mesmo `horario_previsto`.
-- O `worker` consulta os prazos a cada 30 segundos e usa long polling no mesmo processo. Confirmar e Cancelar chegam por botões do Telegram.
+- O `worker` consulta os prazos e escuta o bot no mesmo processo, a cada 10 segundos, no modelo de [escuta.py](../telegram_examplos/escuta.py). Confirmar e Cancelar chegam por botões do Telegram.
 - No `/start`, o bot responde com o `chat_id`. O atendente grava esse valor no paciente. Sem token ou sem `chat_id`, a tela mostra a pendência e nada é marcado como enviado.
 - A tela atualiza os dados da API a cada 5 segundos.
 - CPF com 11 dígitos, apenas normalizado, sem validar dígitos verificadores.
