@@ -11,7 +11,7 @@ Atue como um engenheiro de software sênior, usando explicações simples para i
 ## Tecnologias e execução
 
 - Backend: Python com FastAPI e SQLAlchemy. O esquema é criado na subida da API.
-- Frontend: React com Vite, gerado no build e servido por Nginx.
+- Frontend: Me pergunte na hora, e sugira opções.
 - Banco de dados: PostgreSQL.
 - Executar frontend, backend e banco em Docker Compose.
 - Iniciar com um único comando: `docker compose up --build`.
