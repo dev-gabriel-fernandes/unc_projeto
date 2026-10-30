@@ -54,6 +54,16 @@ Regras:
 - Criar categorias, estados e ocorrências fictícias na inicialização.
 - Contatos são para registro; não implementar envio de notificações.
 
+## Para o planejamento
+
+- Sem login, usuário ou senha. A apresentação abre direto nas duas telas: cidadão (registrar e consultar) e gestão (quadro, filtros, detalhe, resposta e mudança de estado).
+- A ocorrência nasce em Aberto. O painel pode movê-la entre Aberto, Em análise e Resolvido. A consulta do cidadão não altera dados.
+- O protocolo é curto, legível e único, gerado ao salvar e usado na consulta exata.
+- Imagens do relato e da resposta são opcionais. Aceitar JPEG, PNG e WebP. A API grava o arquivo no volume, guarda só o caminho e devolve uma URL para a interface. O roteiro envia uma foto; o carregamento inicial não precisa de imagens.
+- Uma resposta tem texto e fotos opcionais, em qualquer estado.
+- Operações: listar categorias; criar ocorrência; consultar por protocolo; listar ocorrências com filtros; alterar estado; criar resposta; obter imagem.
+- Na inicialização: as três categorias, os três estados nesta ordem e ocorrências fictícias cobrindo os três estados, pelo menos uma com resposta.
+
 ## Roteiro de verificação manual
 
 1. Registrar um poste apagado com contato, localização e foto.

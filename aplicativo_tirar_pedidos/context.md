@@ -56,6 +56,19 @@ Regras:
 - Não incluir cancelamentos ou estornos neste escopo.
 - Carregar cardápio e estoques fictícios na inicialização.
 
+## Para o planejamento
+
+- Sem login, usuário ou senha. A apresentação abre direto nas duas telas: pedidos e cozinha. A cozinha inclui o quadro e o total de vendas.
+- A mesa é informada por quem pede. `numero_comanda` é único, gerado ao salvar e exibido em seguida. A observação é opcional.
+- O pedido nasce em Recebido e só avança: Recebido, Em preparo, Entregue. Não há retorno nem cancelamento.
+- É obrigatório ao menos um item. O mesmo produto pode aparecer em itens separados; cada item gera uma movimentação.
+- Se qualquer item não tiver estoque, a API recusa o pedido inteiro e não grava baixa parcial. Mudar o estado não mexe no estoque.
+- O total é a soma de quantidade × `preco_unitario`. As vendas somam os pedidos Entregues. Não há coluna nem tabela de total.
+- Produto com estoque zero aparece indisponível. Preços com duas casas decimais.
+- A cozinha consulta a API a cada 5 segundos. A tela de pedidos consulta ao carregar o cardápio e ao enviar.
+- Na inicialização: as três categorias e poucos produtos com preço e estoque, o suficiente para o roteiro. Não criar pedidos de exemplo.
+- Operações: listar cardápio; criar pedido com itens, baixa e movimentações; listar pedidos do quadro; avançar estado; obter o total de vendas.
+
 ## Roteiro de verificação manual
 
 1. Criar um pedido para a mesa 3 com dois produtos e uma observação.

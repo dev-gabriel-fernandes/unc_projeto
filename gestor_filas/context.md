@@ -34,7 +34,7 @@ Gerenciar atendimentos médicos com ficha, horário estimado, agenda e lembretes
 - Não enviar avisos para atendimentos cancelados ou concluídos.
 - Registrar envio bem-sucedido somente após confirmação da API do Telegram e evitar reenvios em verificações posteriores.
 - Executar verificação periódica e recebimento de respostas em um único processo dedicado, usando long polling, sem exigir webhook público.
-- Configurar o token do bot por variável de ambiente. Se faltar token ou vínculo do paciente, mostrar a pendência; não simular envio como se fosse real.
+- Configurar o token do bot pela variável `TELEGRAM_BOT_TOKEN` no arquivo `.env` desta pasta. Esse arquivo fica de fora do Git. Se faltar token ou vínculo do paciente, mostrar a pendência; não simular envio como se fosse real.
 
 ## Tabelas e relacionamentos preestabelecidos
 
@@ -65,6 +65,23 @@ Regras:
 - Usar datas com fuso e apresentar os horários em America/Sao_Paulo.
 - Verificar avisos vencidos ainda não enviados: aviso quando faltarem até 24 horas, lembrete quando faltarem até 30 minutos, sempre antes do atendimento. Isso também atende agendamentos criados próximos ao horário.
 - Carregar pacientes fictícios, profissionais e agendamentos de exemplo.
+
+## Para o planejamento
+
+- Sem login, usuário ou senha. A apresentação abre direto na tela do atendente: paciente, agenda do dia, ficha e quadro. O Telegram não é uma tela.
+- Sintomas, pressão e oxigenação ficam em `sintomas_descricao`. Não criar outras colunas.
+- `numero_ticket` é único, gerado ao agendar e exibido com `horario_previsto` identificado como previsão.
+- Estados nesta ordem: Agendado, Confirmado, Em atendimento, Concluído e Cancelado. O agendamento nasce Agendado.
+- Confirmar leva a Confirmado. Cancelar leva a Cancelado. Os dois só valem a partir de Agendado ou Confirmado.
+- Iniciar leva Agendado ou Confirmado para Em atendimento e exige que o profissional não tenha outro atendimento em andamento. Concluir leva Em atendimento para Concluído.
+- Concluído e Cancelado não mudam de estado e não recebem Telegram.
+- Ativo, para o conflito de horário, é tudo o que não está Concluído nem Cancelado. O conflito é o mesmo profissional com o mesmo `horario_previsto`.
+- O `worker` consulta os prazos a cada 30 segundos e usa long polling no mesmo processo. Confirmar e Cancelar chegam por botões do Telegram.
+- No `/start`, o bot responde com o `chat_id`. O atendente grava esse valor no paciente. Sem token ou sem `chat_id`, a tela mostra a pendência e nada é marcado como enviado.
+- A tela atualiza os dados da API a cada 5 segundos.
+- CPF com 11 dígitos, apenas normalizado, sem validar dígitos verificadores.
+- Na inicialização: profissionais, pacientes e agendamentos em estados diferentes. Exemplos no passado ficam Concluído ou Cancelado, ou já com as datas de envio preenchidas. Exemplos futuros ficam fora da janela de 24 horas ou sem `chat_id`, para o worker não disparar mensagens ao subir. O horário próximo do roteiro é criado na hora.
+- Operações: salvar paciente e vínculo do Telegram; listar pacientes e profissionais; criar agendamento e devolver a ficha; listar a agenda e o quadro; iniciar e concluir.
 
 ## Roteiro de verificação manual
 
